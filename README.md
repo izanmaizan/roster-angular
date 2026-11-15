@@ -1,6 +1,6 @@
 # Roster
 
-Aplikasi penjadwalan shift karyawan. SPA Angular untuk belajar signals, state management, form kompleks, dan RBAC.
+Aplikasi penjadwalan shift karyawan. SPA Angular untuk signals, state management, form kompleks, dan RBAC.
 
 ## Tech stack
 
