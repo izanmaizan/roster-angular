@@ -1,0 +1,18 @@
+<section class="mx-auto max-w-2xl pt-4 sm:pt-10">
+  <p class="text-xs font-medium uppercase tracking-widest text-base-content/50">Masuk</p>
+  <h1 class="mt-2 text-3xl font-semibold tracking-tight">Pilih akun</h1>
+  <p class="mt-2 text-sm text-base-content/60">Versi latihan. Tanpa kata sandi, cukup pilih peran yang ingin dicoba.</p>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-2">
+    @for (k of karyawan; track k.id) {
+      <button type="button" class="group flex items-center gap-4 rounded-box border border-base-300 bg-base-100 p-4 text-left transition hover:border-primary/50" (click)="pilih(k.id)">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-base-200 text-sm font-semibold">{{ inisial(k.nama) }}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block font-medium">{{ k.nama }}</span>
+          <span class="block text-sm text-base-content/55">{{ k.unit }}</span>
+        </span>
+        <span class="badge badge-sm badge-ghost capitalize">{{ k.peran }}</span>
+      </button>
+    }
+  </div>
+</section>

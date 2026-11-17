@@ -1,0 +1,120 @@
+<section class="space-y-6">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-widest text-base-content/50">Jadwal</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{{ rentang() }}</h1>
+      @if (puedeEditar) {
+        <p class="mt-2 hidden text-sm text-base-content/60 sm:block">Klik <span class="font-mono">+</span> untuk menambah shift. Seret shift ke sel lain untuk memindahkan.</p>
+      }
+    </div>
+    <div class="join">
+      <button type="button" class="btn btn-sm join-item" (click)="roster.pindah(-1)" aria-label="Minggu sebelumnya">‹</button>
+      <button type="button" class="btn btn-sm join-item" (click)="roster.kembaliKeKini()">Minggu ini</button>
+      <button type="button" class="btn btn-sm join-item" (click)="roster.pindah(1)" aria-label="Minggu berikutnya">›</button>
+    </div>
+  </header>
+
+  <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+    <table class="w-full min-w-[56rem] border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-base-300 bg-base-200/50">
+          <th class="sticky left-0 z-10 w-28 bg-base-200 px-3 py-3 text-left text-xs font-medium text-base-content/55 sm:w-48 sm:px-4">Karyawan</th>
+          @for (h of roster.hari(); track h; let i = $index) {
+            <th class="px-1.5 py-3 text-center" [class.text-primary]="h === kini">
+              <span class="block text-[11px] font-medium uppercase tracking-wider text-base-content/55" [class.text-primary]="h === kini">{{ namaHari[i] }}</span>
+              <span class="font-mono text-sm tabular-nums">{{ h.slice(8) }}</span>
+            </th>
+          }
+          <th class="w-40 px-4 py-3 text-left text-xs font-medium text-base-content/55">Jam minggu ini</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (k of karyawan; track k.id) {
+          <tr class="border-b border-base-300/70 last:border-0">
+            <td class="sticky left-0 z-10 bg-base-100 px-3 py-3 sm:px-4">
+              <p class="font-medium">{{ k.nama }}</p>
+              <p class="text-xs text-base-content/50">{{ k.unit }}</p>
+            </td>
+            @for (h of roster.hari(); track h) {
+              <td class="p-1.5 align-middle transition"
+                [class.ring-2]="sasaran() === kunci(k.id, h)"
+                [class.ring-inset]="sasaran() === kunci(k.id, h)"
+                [class.ring-primary]="sasaran() === kunci(k.id, h)"
+                (dragover)="$event.preventDefault()"
+                (dragenter)="sasaran.set(kunci(k.id, h))"
+                (drop)="jatuhkan(k.id, h, $event)">
+                @if (roster.shiftPada(k.id, h); as s) {
+                  <div class="group relative flex items-center rounded-field border border-primary/25 bg-primary/10 px-2.5 py-2 text-xs transition hover:border-primary/60"
+                    [class.cursor-grab]="puedeEditar"
+                    [attr.draggable]="puedeEditar"
+                    (dragstart)="mulaiSeret(s.id, $event)"
+                    (dragend)="akhiriSeret()">
+                    <span class="font-mono tabular-nums whitespace-nowrap">{{ s.mulai }}–{{ s.selesai }}</span>
+                    @if (s.karyawanId === sesi.pengguna()?.id && s.tanggal >= kini) {
+                      <a routerLink="/tukar" [queryParams]="{ shift: s.id }" class="ml-2 link link-primary text-[11px] font-medium no-underline hover:underline">Tukar</a>
+                    }
+                    @if (puedeEditar) {
+                      <button type="button" class="btn btn-ghost btn-xs btn-square absolute -right-1.5 -top-1.5 size-5 min-h-0 bg-base-100 p-0 text-base-content/60 shadow-sm opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100" (click)="hapus(s.id, $event)" [attr.aria-label]="'Hapus shift ' + k.nama + ' ' + h">×</button>
+                    }
+                  </div>
+                } @else {
+                  @if (puedeEditar) {
+                    <button type="button" class="grid h-10 w-full place-items-center rounded-field border border-dashed border-transparent text-base-content/25 transition hover:border-base-300 hover:bg-base-200/60 hover:text-base-content/70 focus-visible:border-primary" (click)="bukaModal(k.id, h)" [attr.aria-label]="'Tambah shift ' + k.nama + ' ' + h">+</button>
+                  } @else {
+                    <div class="grid h-10 place-items-center text-base-content/20">–</div>
+                  }
+                }
+              </td>
+            }
+            <td class="px-4 py-3">
+              <div class="flex items-baseline justify-between gap-2 font-mono text-xs tabular-nums">
+                <span [class.text-error]="kelebihan(k.id)" [class.font-semibold]="kelebihan(k.id)">{{ roster.jam(k.id) }}</span>
+                <span class="text-base-content/45">/ {{ batas }}</span>
+              </div>
+              <progress class="progress mt-1.5 h-1.5 w-full" [class.progress-error]="kelebihan(k.id)" [class.progress-primary]="!kelebihan(k.id)" [value]="roster.jam(k.id)" [max]="batas"></progress>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="border-t border-base-300 bg-base-200/50 text-xs text-base-content/60">
+          <td class="sticky left-0 z-10 bg-base-200 px-3 py-2.5 font-medium sm:px-4">Terjadwal</td>
+          @for (h of roster.hari(); track h) {
+            <td class="px-1.5 py-2.5 text-center font-mono tabular-nums">{{ roster.jumlahPada(h) }}</td>
+          }
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+@if (modal(); as m) {
+  <div class="modal modal-open" role="dialog" aria-modal="true" aria-labelledby="judul-shift" (keydown.escape)="tutupModal()">
+    <div class="modal-box max-w-sm rounded-box">
+      <form (ngSubmit)="simpan()">
+        <h2 id="judul-shift" class="text-lg font-semibold">Tambah shift</h2>
+        <p class="mt-1 text-sm text-base-content/60">{{ namaModal() }} · {{ tanggalModal() }}</p>
+
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <label class="block">
+            <span class="mb-1 block text-xs text-base-content/60">Mulai</span>
+            <input name="mulai" type="time" class="input input-sm w-full" [(ngModel)]="mulai" required autofocus />
+          </label>
+          <label class="block">
+            <span class="mb-1 block text-xs text-base-content/60">Selesai</span>
+            <input name="selesai" type="time" class="input input-sm w-full" [(ngModel)]="selesai" required />
+          </label>
+        </div>
+
+        <p class="mt-3 min-h-5 text-sm text-error" role="alert">{{ galatModal() }}</p>
+
+        <div class="modal-action mt-2">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="tutupModal()">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+        </div>
+      </form>
+    </div>
+    <button type="button" class="modal-backdrop bg-base-content/20" (click)="tutupModal()" aria-label="Tutup"></button>
+  </div>
+}

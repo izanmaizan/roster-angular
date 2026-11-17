@@ -1,0 +1,112 @@
+<section class="space-y-8">
+  <header>
+    <p class="text-xs font-medium uppercase tracking-widest text-base-content/50">Tukar shift</p>
+    <h1 class="mt-1 text-3xl font-semibold tracking-tight">Pengajuan</h1>
+    <p class="mt-2 max-w-xl text-sm text-base-content/60">Ajukan pengganti untuk shift mendatang. Setelah manajer menyetujui, jadwal langsung berubah.</p>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]">
+    @if (sesi.boleh('ajukanTukar')) {
+      <form class="h-fit space-y-4 rounded-box border border-base-300 bg-base-100 p-5" (ngSubmit)="ajukan()">
+        <h2 class="font-semibold">Ajukan tukar</h2>
+        @if (shiftSaya().length) {
+          <label class="block">
+            <span class="mb-1 block text-xs text-base-content/60">Shift saya</span>
+            <select name="shift" class="select select-sm w-full" [(ngModel)]="draf.shiftId">
+              <option value="">Pilih shift</option>
+              @for (s of shiftSaya(); track s.id) {
+                <option [value]="s.id">{{ tanggalPendek(s.tanggal) }} · {{ s.mulai }}–{{ s.selesai }}</option>
+              }
+            </select>
+          </label>
+          <label class="block">
+            <span class="mb-1 block text-xs text-base-content/60">Pengganti</span>
+            <select name="pengganti" class="select select-sm w-full" [(ngModel)]="draf.penggantiId">
+              <option value="">Pilih karyawan</option>
+              @for (k of pengganti(); track k.id) {
+                <option [value]="k.id">{{ k.nama }}</option>
+              }
+            </select>
+          </label>
+          <label class="block">
+            <span class="mb-1 block text-xs text-base-content/60">Alasan</span>
+            <textarea name="alasan" class="textarea textarea-sm w-full" rows="3" maxlength="200" [(ngModel)]="draf.alasan"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary btn-sm w-full">Kirim pengajuan</button>
+        } @else {
+          <p class="text-sm text-base-content/60">Tidak ada shift mendatang untuk ditukar.</p>
+        }
+      </form>
+    }
+
+    <ul class="space-y-3" [class.lg:col-span-2]="!sesi.boleh('ajukanTukar')">
+      @for (t of daftar(); track t.id) {
+        <li class="rounded-box border border-base-300 bg-base-100 p-4">
+          @if (editId() === t.id) {
+            <form class="space-y-3" (ngSubmit)="simpanUbah(t)">
+              <p class="text-sm font-medium">Ubah pengajuan</p>
+              <p class="font-mono text-xs text-base-content/55">{{ info(t.shiftId) }}</p>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="block">
+                  <span class="mb-1 block text-xs text-base-content/60">Pengganti</span>
+                  <select name="penggantiUbah" class="select select-sm w-full" [(ngModel)]="ubah.penggantiId">
+                    @for (k of karyawan; track k.id) {
+                      @if (k.id !== t.pengajuId) {
+                        <option [value]="k.id">{{ k.nama }}</option>
+                      }
+                    }
+                  </select>
+                </label>
+                <label class="block">
+                  <span class="mb-1 block text-xs text-base-content/60">Alasan</span>
+                  <input name="alasanUbah" type="text" class="input input-sm w-full" maxlength="200" [(ngModel)]="ubah.alasan" />
+                </label>
+              </div>
+              <div class="flex justify-end gap-2">
+                <button type="button" class="btn btn-ghost btn-sm" (click)="batalUbah()">Batal</button>
+                <button type="submit" class="btn btn-primary btn-sm">Simpan perubahan</button>
+              </div>
+            </form>
+          } @else {
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-sm">
+                  <span class="font-medium">{{ nama(t.pengajuId) }}</span>
+                  <span class="text-base-content/40"> → </span>
+                  <span class="font-medium">{{ nama(t.penggantiId) }}</span>
+                </p>
+                <p class="mt-1 font-mono text-xs text-base-content/55">{{ info(t.shiftId) }}</p>
+                <p class="mt-2 text-sm text-base-content/75">{{ t.alasan }}</p>
+                @if (t.dibuat) {
+                  <p class="mt-2 text-xs text-base-content/45">Dibuat {{ tanggalPendek(t.dibuat.slice(0, 10)) }}</p>
+                }
+                @if (t.status === 'disetujui') {
+                  <p class="mt-1 text-xs text-success">Jadwal sudah dipindah ke {{ nama(t.penggantiId) }}.</p>
+                }
+              </div>
+              <span class="badge badge-sm capitalize"
+                [class.badge-warning]="t.status === 'menunggu'"
+                [class.badge-success]="t.status === 'disetujui'"
+                [class.badge-error]="t.status === 'ditolak'">{{ t.status }}</span>
+            </div>
+
+            @if (t.status === 'menunggu' && (bisaUbah(t) || sesi.boleh('setujuiTukar'))) {
+              <div class="mt-4 flex flex-wrap justify-end gap-2">
+                @if (bisaUbah(t)) {
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="mulaiUbah(t)">Ubah</button>
+                  <button type="button" class="btn btn-ghost btn-sm text-error" (click)="batalkan(t)">Batalkan</button>
+                }
+                @if (sesi.boleh('setujuiTukar')) {
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="tolak(t.id)">Tolak</button>
+                  <button type="button" class="btn btn-primary btn-sm" (click)="setujui(t.id)">Setujui</button>
+                }
+              </div>
+            }
+          }
+        </li>
+      } @empty {
+        <li class="rounded-box border border-dashed border-base-300 p-10 text-center text-sm text-base-content/55">Belum ada pengajuan.</li>
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "roster";
+  default: true;
+  color-scheme: light;
+  --color-base-100: oklch(99% 0.003 85);
+  --color-base-200: oklch(96.5% 0.004 85);
+  --color-base-300: oklch(90% 0.006 85);
+  --color-base-content: oklch(23% 0.015 260);
+  --color-primary: oklch(46% 0.08 178);
+  --color-primary-content: oklch(98% 0.01 178);
+  --color-secondary: oklch(55% 0.02 260);
+  --color-secondary-content: oklch(98% 0.005 260);
+  --color-accent: oklch(70% 0.1 70);
+  --color-accent-content: oklch(22% 0.03 70);
+  --color-neutral: oklch(28% 0.015 260);
+  --color-neutral-content: oklch(96% 0.005 85);
+  --color-info: oklch(55% 0.1 240);
+  --color-info-content: oklch(98% 0.01 240);
+  --color-success: oklch(52% 0.11 155);
+  --color-success-content: oklch(98% 0.01 155);
+  --color-warning: oklch(76% 0.14 75);
+  --color-warning-content: oklch(25% 0.04 75);
+  --color-error: oklch(54% 0.19 25);
+  --color-error-content: oklch(98% 0.01 25);
+  --radius-selector: 0.375rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.625rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "roster-gelap";
+  default: false;
+  color-scheme: dark;
+  --color-base-100: oklch(20% 0.012 260);
+  --color-base-200: oklch(17.5% 0.012 260);
+  --color-base-300: oklch(31% 0.014 260);
+  --color-base-content: oklch(93% 0.008 90);
+  --color-primary: oklch(78% 0.1 178);
+  --color-primary-content: oklch(20% 0.03 178);
+  --color-secondary: oklch(70% 0.02 260);
+  --color-secondary-content: oklch(20% 0.02 260);
+  --color-accent: oklch(78% 0.1 70);
+  --color-accent-content: oklch(25% 0.04 70);
+  --color-neutral: oklch(92% 0.005 90);
+  --color-neutral-content: oklch(20% 0.01 260);
+  --color-info: oklch(72% 0.1 240);
+  --color-info-content: oklch(20% 0.03 240);
+  --color-success: oklch(74% 0.13 155);
+  --color-success-content: oklch(20% 0.04 155);
+  --color-warning: oklch(82% 0.13 80);
+  --color-warning-content: oklch(25% 0.04 80);
+  --color-error: oklch(70% 0.17 25);
+  --color-error-content: oklch(20% 0.04 25);
+  --radius-selector: 0.375rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.625rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@layer base {
+  html {
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+  }
+}

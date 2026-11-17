@@ -1,5 +1,5 @@
 {
-  "name": "roster-angular",
+  "name": "dashboard-angular",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -17,6 +17,7 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "daisyui": "^5.8.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -24,8 +25,10 @@
     "@angular/build": "^22.2.7",
     "@angular/cli": "^22.2.7",
     "@angular/compiler-cli": "^22.2.0",
+    "@tailwindcss/postcss": "^4.3.5",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
+    "tailwindcss": "^4.3.5",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
   }
